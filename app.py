@@ -84,10 +84,9 @@ def main():
   dp.add_handler(CallbackQueryHandler(youtube_handler))
  
   
-  PORT = int(os.environ.get("PORT", "8443"))
-  updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=BOT_TOKEN)
-  updater.bot.set_webhook("https://nopekun-bot-telegram.herokuapp.com/{}".format(TOKEN))
-
+  updater.start_polling()
+  
+  updater.idle()
   
 
 if (__name__) == "__main__":
