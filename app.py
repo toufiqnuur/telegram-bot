@@ -1,3 +1,4 @@
+import os
 import pafy
 import logging
 from datetime import datetime
@@ -5,6 +6,10 @@ from telegram import *
 from telegram.ext import *
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+
+BOT_TOKEN = os.getenv("BOT_API")
+YT_TOKEN = os.getenv("YT_API")
 
 url = ""
 
@@ -28,7 +33,7 @@ def youtube_handler(update, context):
   query = update.callback_query
   query.answer()
   
-  pafy.set_api_key(YT_API)
+  pafy.set_api_key(YT_TOKEN)
   content = pafy.new(url)
   streams = content.streams if query.data == "video" else content.audiostreams
   
@@ -71,16 +76,19 @@ def start(update, context):
 
 
 def main(): 
-  updater = Updater(BOT_API)
+  updater = Updater(BOT_TOKEN)
   dp = updater.dispatcher
   
   dp.add_handler(CommandHandler("start",start))
   dp.add_handler(MessageHandler(Filters.regex('(youtu|youtube)') & ~Filters.command, youtube))
   dp.add_handler(CallbackQueryHandler(youtube_handler))
  
-  updater.start_polling()
   
-  updater.idle()
+  PORT = int(os.environ.get("PORT", "8443"))
+  updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=BOT_TOKEN)
+  updater.bot.set_webhook("https://nopekun-bot-telegram.herokuapp.com/{}".format(TOKEN))
+
+  
 
 if (__name__) == "__main__":
   main()
